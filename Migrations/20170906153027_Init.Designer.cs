@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 using ToDoWithAuth.Data;
 
-namespace ToDoWithAuth.Data.Migrations
+namespace ToDoWithAuth.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170906153027_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,13 +183,17 @@ namespace ToDoWithAuth.Data.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("Complete");
+                    b.Property<bool?>("Complete");
 
                     b.Property<string>("TaskName");
 
                     b.Property<DateTime>("Time");
 
+                    b.Property<string>("UserID");
+
                     b.HasKey("ID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("ToDos");
                 });
@@ -236,6 +241,13 @@ namespace ToDoWithAuth.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("ToDoWithAuth.Models.ToDoModel", b =>
+                {
+                    b.HasOne("ToDoWithAuth.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID");
                 });
 #pragma warning restore 612, 618
         }

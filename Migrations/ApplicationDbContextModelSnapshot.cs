@@ -8,16 +8,16 @@ using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 using ToDoWithAuth.Data;
 
-namespace ToDoWithAuth.Data.Migrations
+namespace ToDoWithAuth.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170906143221_AddToDos")]
-    partial class AddToDos
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasAnnotation("ProductVersion", "2.0.0-rtm-26452");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -182,13 +182,17 @@ namespace ToDoWithAuth.Data.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("Complete");
+                    b.Property<bool?>("Complete");
 
                     b.Property<string>("TaskName");
 
                     b.Property<DateTime>("Time");
 
+                    b.Property<string>("UserID");
+
                     b.HasKey("ID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("ToDos");
                 });
@@ -236,6 +240,13 @@ namespace ToDoWithAuth.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("ToDoWithAuth.Models.ToDoModel", b =>
+                {
+                    b.HasOne("ToDoWithAuth.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID");
                 });
 #pragma warning restore 612, 618
         }

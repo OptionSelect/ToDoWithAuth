@@ -6,7 +6,7 @@ namespace ToDoWithAuth.Models
     {
         public int ID { get; set; }
         public string TaskName { get; set; }
-        public bool Complete { get; set; } = false; 
+        public bool? Complete { get; set; } = false; 
         public DateTime Time {get; set;} = DateTime.Now;
 
         public void CompleteTask()
@@ -14,5 +14,8 @@ namespace ToDoWithAuth.Models
             Complete = true;
             Time = DateTime.Now;
         }
+
+        public string UserID {get; set;}
+        public ApplicationUser User {get; set;}
     }
 }
