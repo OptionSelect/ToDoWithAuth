@@ -3,38 +3,50 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ToDoWithAuth.Data;
 using ToDoWithAuth.Models;
 
 namespace ToDoWithAuth.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ApplicationDbContext context)
+        public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> um)
         {
             _context = context;
+            _userManager = um;
         }
 
         [HttpPost]
-        public IActionResult Index(string newToDoName)
+        public async Task<IActionResult> Index(string newToDoName)
         {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
             var currentToDo = new ToDoModel{
                 TaskName = newToDoName
             };
+
+            currentToDo.UserID = user.Id;
             
             _context.ToDos.Add(currentToDo);
             _context.SaveChanges();
 
-            return View(_context.ToDos.ToList());
+            return View(_context.ToDos.Where(w => w.UserID == user.Id).ToList());
         }
 
-
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_context.ToDos.ToList());
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            var applicationDbContext = _context.ToDos.Include(p => p.User).Where(w => w.UserID == user.Id);
+            return View(await applicationDbContext.ToListAsync());
         }
 
         [HttpPost]
